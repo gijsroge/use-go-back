@@ -2,7 +2,7 @@
 
 A React hook that navigates back to a specific route in browser history using the Navigation API, preserving scroll position.
 
-![use-go-back demo](./docs/assets/demo.gif)
+<img src="./docs/assets/demo.gif" alt="use-go-back demo" width="350" />
 
 ## Features
 
