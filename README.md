@@ -47,10 +47,28 @@ import { useGoBack } from "use-go-back";
 function SearchLayout() {
   // Go back to any search-related page
   const goBack = useGoBack({
-    targetPathname: (pathname) => pathname.startsWith("/search"),
+    targetPathname: (url) => url.pathname.startsWith("/search"),
   });
 
   return <button onClick={goBack}>Back to Search</button>;
+}
+```
+
+### With URL Object (Search Params, Origin, etc.)
+
+```tsx
+import { useGoBack } from "use-go-back";
+
+function FilterLayout() {
+  // Match based on search params or origin
+  const goBack = useGoBack({
+    targetPathname: (url) =>
+      url.pathname === "/dashboard" ||
+      url.searchParams.has("filter") ||
+      url.origin === "https://app.example.com",
+  });
+
+  return <button onClick={goBack}>Back</button>;
 }
 ```
 
@@ -79,7 +97,7 @@ Returns a function that navigates back to the target route.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `targetPathname` | `string \| ((pathname: string) => boolean)` | `"/"` | The target pathname to go back to. Can be an exact string match or a custom matcher function. |
+| `targetPathname` | `string \| ((url: URL) => boolean)` | `"/"` | The target pathname to go back to. Can be an exact string match or a custom matcher function that receives the full URL object (allowing matching on pathname, origin, search params, etc.). |
 | `fallbackUrl` | `string` | `undefined` | Fallback URL to navigate to if Navigation API is not available and no matching history entry is found. |
 
 #### Returns

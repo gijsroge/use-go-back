@@ -68,7 +68,7 @@ describe("useGoBack", () => {
 			writable: true,
 		})
 
-		const { result } = renderHook(() => useGoBack({ targetPathname: (path) => path.startsWith("/test") }))
+		const { result } = renderHook(() => useGoBack({ targetPathname: (url) => url.pathname.startsWith("/test") }))
 
 		result.current()
 
@@ -118,7 +118,7 @@ describe("useGoBack", () => {
 
 		const { result } = renderHook(() =>
 			useGoBack({
-				targetPathname: (pathname) => pathname.startsWith("/search"),
+				targetPathname: (url) => url.pathname.startsWith("/search"),
 			})
 		)
 
@@ -126,6 +126,35 @@ describe("useGoBack", () => {
 
 		// Should go back to the closest matching entry (index 1)
 		expect(mockHistoryGo).toHaveBeenCalledWith(-1)
+	})
+
+	it("should handle custom matcher with URL object (search params)", () => {
+		const mockEntries = [
+			{ url: "https://example.com/search?filter=active", index: 0 },
+			{ url: "https://example.com/search/results", index: 1 },
+			{ url: "https://example.com/search/results/123", index: 2 },
+		]
+
+		const mockNavigation = {
+			currentEntry: { index: 2 },
+			entries: () => mockEntries,
+		}
+
+		Object.defineProperty(window, "navigation", {
+			value: mockNavigation,
+			writable: true,
+		})
+
+		const { result } = renderHook(() =>
+			useGoBack({
+				targetPathname: (url) => url.searchParams.has("filter"),
+			})
+		)
+
+		result.current()
+
+		// Should go back to the closest matching entry (index 0)
+		expect(mockHistoryGo).toHaveBeenCalledWith(-2)
 	})
 
 	it("should use fallback when Navigation API is available but no match found", () => {

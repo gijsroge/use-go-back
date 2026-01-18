@@ -1,12 +1,12 @@
 import { useCallback } from "react"
 
-type PathnameMatcher = string | ((pathname: string) => boolean)
+type PathnameMatcher = string | ((url: URL) => boolean)
 
 interface UseGoBackOptions {
 	/**
 	 * The target pathname to go back to. Can be:
 	 * - A string: exact pathname match (e.g., "/")
-	 * - A function: custom matcher function (e.g., (pathname) => pathname === "/" || pathname.startsWith("/search"))
+	 * - A function: custom matcher function that receives the full URL object (e.g., (url) => url.pathname === "/" || url.pathname.startsWith("/search") || url.searchParams.has("filter"))
 	 * @default "/"
 	 */
 	targetPathname?: PathnameMatcher
@@ -31,7 +31,12 @@ interface UseGoBackOptions {
  *
  * // Go back to any search-related page
  * const goBack = useGoBack({
- *   targetPathname: (pathname) => pathname.startsWith("/search")
+ *   targetPathname: (url) => url.pathname.startsWith("/search")
+ * });
+ *
+ * // Match based on search params or origin
+ * const goBack = useGoBack({
+ *   targetPathname: (url) => url.origin === "https://app.example.com" || url.searchParams.has("filter")
  * });
  *
  * // Use with a button
@@ -41,12 +46,12 @@ interface UseGoBackOptions {
 export function useGoBack(options: UseGoBackOptions = {}) {
 	const { targetPathname = "/", fallbackUrl } = options
 
-	const matchesPathname = useCallback(
-		(pathname: string): boolean => {
+	const matchesUrl = useCallback(
+		(url: URL): boolean => {
 			if (typeof targetPathname === "string") {
-				return pathname === targetPathname
+				return url.pathname === targetPathname
 			}
-			return targetPathname(pathname)
+			return targetPathname(url)
 		},
 		[targetPathname]
 	)
@@ -65,7 +70,7 @@ export function useGoBack(options: UseGoBackOptions = {}) {
 				if (entry) {
 					const url = new URL(entry.url)
 					// Check if this entry matches the target pathname
-					if (matchesPathname(url.pathname)) {
+					if (matchesUrl(url)) {
 						// Calculate how many steps back we need to go
 						const stepsBack = currentIndex - i
 						// Use browser navigation to go back, which restores scroll position
@@ -84,7 +89,7 @@ export function useGoBack(options: UseGoBackOptions = {}) {
 		} else {
 			window.history.back()
 		}
-	}, [matchesPathname, fallbackUrl, targetPathname])
+	}, [matchesUrl, fallbackUrl, targetPathname])
 
 	return goBack
 }
