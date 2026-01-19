@@ -1,6 +1,7 @@
 {
 	"name": "use-go-back",
 	"version": "1.1.0",
+	"deprecated": "This package is deprecated. Please use go-back-to instead: https://github.com/gijsroge/go-back-to",
 	"description": "A React hook that navigates back to a specific route in browser history using the Navigation API, preserving scroll position",
 	"type": "module",
 	"main": "./dist/index.js",

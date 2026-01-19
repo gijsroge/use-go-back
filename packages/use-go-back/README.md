@@ -1,5 +1,7 @@
 # use-go-back
 
+> ⚠️ **This package is deprecated.** Please use [go-back-to](https://github.com/gijsroge/go-back-to) instead, which provides the same functionality as a framework-agnostic utility function.
+
 A React hook that navigates back to a specific route in browser history using the Navigation API, preserving scroll position.
 
 ## Features
